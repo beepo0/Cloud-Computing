@@ -1,0 +1,36 @@
+name: Laravel CI/CD with Docker
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🧾 Checkout repo
+      uses: actions/checkout@v3
+
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: 📦 Install dependencies
+      run: |
+        cd tugas-manager
+        composer install --no-interaction --prefer-dist --optimize-autoloader
+
+    - name: ⚙️ Copy .env example
+      run: |
+        cp tugas-manager/.env.example tugas-manager/.env
+
+    - name: 🔑 Generate Laravel Key
+      run: |
+        cd tugas-manager
+        php artisan key:generate
+
+    - name: 🐳 Build Docker image
+      run: |
+        docker build -t cloud-computing-app ./tugas-manager
